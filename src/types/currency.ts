@@ -47,3 +47,9 @@ export interface League {
   id: string;
   text: string;
 }
+
+export interface InputCurrency {
+  id: string;
+  currency: CurrencyItem | null;
+  amount: string;
+}

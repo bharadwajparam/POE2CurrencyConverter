@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpDown, Coins, RefreshCw, AlertCircle } from 'lucide-react';
+import { ArrowUpDown, Coins, RefreshCw, AlertCircle, PlusCircle } from 'lucide-react';
 import { CurrencySelect } from './components/CurrencySelect';
 import { CurrencyInput } from './components/CurrencyInput';
+import { CurrencyInputRow } from './components/CurrencyInputRow';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useCurrencyData } from './hooks/useCurrencyData';
 import { convertCurrency } from './utils/currencyConverter';
-import { Currency, League, CurrencyItem } from './types/currency';
+import { Currency, League, CurrencyItem, InputCurrency } from './types/currency';
 
 function App() {
   const { currencies, leagues, selectedLeague, setSelectedLeague, loading, error } = useCurrencyData();
   const [pendingSelectedLeague, setPendingSelectedLeague] = useState<string>(selectedLeague);
-  const [fromCurrency, setFromCurrency] = useState<CurrencyItem | null>(null);
+  const [inputCurrencies, setInputCurrencies] = useState<InputCurrency[]>([]);
   const [toCurrency, setToCurrency] = useState<CurrencyItem | null>(null);
-  const [fromAmount, setFromAmount] = useState<string>('1');
   const [toAmount, setToAmount] = useState<string>('0');
+  const [nextId, setNextId] = useState(0);
 
   // Update pendingSelectedLeague when selectedLeague changes from outside (e.g., initial load)
   useEffect(() => {
@@ -30,37 +31,49 @@ function App() {
   // Set default currencies when data loads
   useEffect(() => {
     console.log('Setting default currencies, currencies length:', mappedCurrencies.length);
-    if (mappedCurrencies.length > 0 && !fromCurrency) {
-      const chaos = mappedCurrencies.find(c => c.name.toLowerCase().includes('chaos'));
-      const exalted = mappedCurrencies.find(c => c.name.toLowerCase().includes('exalted'));
-
-      console.log('Found chaos:', chaos, 'Found exalted:', exalted);
+    if (mappedCurrencies.length > 0 && inputCurrencies.length === 0) {
+      const chaos = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('chaos'));
+      const exalted = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('exalted'));
 
       if (chaos) {
-        const fullChaosCurrency = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('chaos'));
-        setFromCurrency(fullChaosCurrency || null);
+        setInputCurrencies([{ id: `input-${nextId}`, currency: chaos, amount: '1' }]);
+        setNextId(prevId => prevId + 1);
       }
       if (exalted) {
-        const fullExaltedCurrency = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('exalted'));
-        setToCurrency(fullExaltedCurrency || null);
+        setToCurrency(exalted);
       }
     }
-  }, [mappedCurrencies, fromCurrency, currencies]);
+  }, [mappedCurrencies, currencies, inputCurrencies.length]);
 
   // Convert currency when values change
   useEffect(() => {
-    if (fromCurrency && toCurrency && fromAmount) {
-      const amount = parseFloat(fromAmount) || 0;
-      const converted = convertCurrency(amount, fromCurrency, toCurrency);
-      setToAmount(converted.toString());
+    if (inputCurrencies.length > 0 && toCurrency) {
+      let totalChaosValue = 0;
+      for (const input of inputCurrencies) {
+        if (input.currency && input.amount) {
+          const amount = parseFloat(input.amount) || 0;
+          totalChaosValue += amount * input.currency.chaosValue;
+        }
+      }
+      const converted = totalChaosValue / toCurrency.chaosValue;
+      setToAmount((Math.round(converted * 100) / 100).toString());
+    } else {
+      setToAmount('0');
     }
-  }, [fromAmount, fromCurrency, toCurrency]);
+  }, [inputCurrencies, toCurrency]);
 
-  const handleSwapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-    setFromAmount(toAmount);
+  const handleAddCurrencyInput = () => {
+    setInputCurrencies(prevInputs => [
+      ...prevInputs,
+      { id: `input-${nextId}`, currency: null, amount: '1' }
+    ]);
+    setNextId(prevId => prevId + 1);
   };
+
+  const handleRemoveCurrencyInput = (id: string) => {
+    setInputCurrencies(prevInputs => prevInputs.filter(input => input.id !== id));
+  };
+
 
   const handleRefresh = () => {
     window.location.reload();
@@ -153,35 +166,43 @@ function App() {
 
           <div className="space-y-6">
             {/* From Currency */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <CurrencySelect
+            {/* Input Currencies */}
+            {inputCurrencies.map((input, index) => (
+              <CurrencyInputRow
+                key={input.id}
+                id={input.id}
                 currencies={mappedCurrencies}
-                selectedCurrency={fromCurrency ? { id: fromCurrency.apiId, name: fromCurrency.itemMetadata?.name || fromCurrency.text, icon: fromCurrency.itemMetadata?.icon || fromCurrency.iconUrl } : null}
-                onSelect={(currency: Currency) => {
+                selectedCurrency={input.currency}
+                amount={input.amount}
+                onCurrencySelect={(currency: Currency) => {
                   const fullCurrencyItem = currencies.find(item => item.apiId === currency.id);
-                  setFromCurrency(fullCurrencyItem || null);
+                  setInputCurrencies(prevInputs =>
+                    prevInputs.map(item =>
+                      item.id === input.id ? { ...item, currency: fullCurrencyItem || null } : item
+                    )
+                  );
                 }}
-                label="From"
-                placeholder="Select source currency"
+                onAmountChange={(amount: string) => {
+                  setInputCurrencies(prevInputs =>
+                    prevInputs.map(item =>
+                      item.id === input.id ? { ...item, amount } : item
+                    )
+                  );
+                }}
+                onRemove={handleRemoveCurrencyInput}
+                label={`Currency ${index + 1}`}
+                isRemovable={inputCurrencies.length > 1}
               />
-              <CurrencyInput
-                value={fromAmount}
-                onChange={setFromAmount}
-                label="Amount"
-                placeholder="Enter amount"
-              />
-            </div>
+            ))}
 
-            {/* Swap Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleSwapCurrencies}
-                disabled={!fromCurrency || !toCurrency}
-                className="bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed p-3 rounded-full transition-all hover:scale-105"
-              >
-                <ArrowUpDown className="w-6 h-6 text-gray-600" />
-              </button>
-            </div>
+            {/* Add Currency Button */}
+            <button
+              onClick={handleAddCurrencyInput}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2 mt-4"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Add Another Currency</span>
+            </button>
 
             {/* To Currency */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,12 +226,13 @@ function App() {
             </div>
 
             {/* Exchange Rate Display */}
-            {fromCurrency && toCurrency && fromAmount && (
+            {/* Exchange Rate Display */}
+            {toCurrency && inputCurrencies.some(input => input.currency && parseFloat(input.amount) > 0) && (
               <div className="bg-blue-50 rounded-xl p-4 mt-6">
                 <div className="text-center">
-                  <p className="text-sm text-blue-600 font-medium mb-1">Exchange Rate</p>
+                  <p className="text-sm text-blue-600 font-medium mb-1">Total Converted Amount</p>
                   <p className="text-lg font-bold text-blue-900">
-                    1 {fromCurrency.itemMetadata?.name || fromCurrency.text} = {convertCurrency(1, fromCurrency, toCurrency)} {toCurrency.itemMetadata?.name || toCurrency.text}
+                    {toAmount} {toCurrency.itemMetadata?.name || toCurrency.text}
                   </p>
                 </div>
               </div>
