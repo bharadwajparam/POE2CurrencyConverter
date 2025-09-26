@@ -13,7 +13,6 @@ function App() {
   const [toCurrency, setToCurrency] = useState<CurrencyItem | null>(null);
   const [fromAmount, setFromAmount] = useState<string>('1');
   const [toAmount, setToAmount] = useState<string>('0');
-  const [baseCurrency, setBaseCurrency] = useState<'chaos' | 'exalted' | 'divine'>('chaos');
 
   // Map CurrencyItem to Currency for CurrencySelect component
   const mappedCurrencies: Currency[] = currencies.map(item => ({
@@ -46,10 +45,10 @@ function App() {
   useEffect(() => {
     if (fromCurrency && toCurrency && fromAmount) {
       const amount = parseFloat(fromAmount) || 0;
-      const converted = convertCurrency(amount, fromCurrency, toCurrency, baseCurrency);
+      const converted = convertCurrency(amount, fromCurrency, toCurrency);
       setToAmount(converted.toString());
     }
-  }, [fromAmount, fromCurrency, toCurrency, baseCurrency]);
+  }, [fromAmount, fromCurrency, toCurrency]);
 
   const handleSwapCurrencies = () => {
     setFromCurrency(toCurrency);
@@ -131,26 +130,6 @@ function App() {
           </div>
 
           {/* Base Currency Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Base Currency for Conversion
-            </label>
-            <div className="flex space-x-2">
-              {['chaos', 'exalted', 'divine'].map((base) => (
-                <button
-                  key={base}
-                  onClick={() => setBaseCurrency(base as any)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    baseCurrency === base
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {base.charAt(0).toUpperCase() + base.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="space-y-6">
             {/* From Currency */}
@@ -211,7 +190,7 @@ function App() {
                 <div className="text-center">
                   <p className="text-sm text-blue-600 font-medium mb-1">Exchange Rate</p>
                   <p className="text-lg font-bold text-blue-900">
-                    1 {fromCurrency.itemMetadata?.name || fromCurrency.text} = {convertCurrency(1, fromCurrency, toCurrency, baseCurrency)} {toCurrency.itemMetadata?.name || toCurrency.text}
+                    1 {fromCurrency.itemMetadata?.name || fromCurrency.text} = {convertCurrency(1, fromCurrency, toCurrency)} {toCurrency.itemMetadata?.name || toCurrency.text}
                   </p>
                 </div>
               </div>
