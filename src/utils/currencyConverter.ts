@@ -1,20 +1,16 @@
-interface Currency {
-  chaosValue: number;
-  exaltedValue: number;
-  divineValue: number;
-}
+import { CurrencyItem } from '../types/currency';
 
 export const convertCurrency = (
   amount: number,
-  fromCurrency: Currency,
-  toCurrency: Currency,
+  fromCurrency: CurrencyItem,
+  toCurrency: CurrencyItem,
   baseCurrency: 'chaos' | 'exalted' | 'divine' = 'chaos'
 ): number => {
   if (!amount || amount <= 0) return 0;
-  
+
   let amountInBase: number;
   let result: number;
-  
+
   switch (baseCurrency) {
     case 'chaos':
       amountInBase = amount * fromCurrency.chaosValue;
@@ -31,6 +27,6 @@ export const convertCurrency = (
     default:
       return 0;
   }
-  
+
   return Math.round(result * 100) / 100;
 };

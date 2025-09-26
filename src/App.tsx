@@ -5,28 +5,42 @@ import { CurrencyInput } from './components/CurrencyInput';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useCurrencyData } from './hooks/useCurrencyData';
 import { convertCurrency } from './utils/currencyConverter';
+import { Currency, League, CurrencyItem } from './types/currency';
 
 function App() {
-  const { currencies, loading, error } = useCurrencyData();
-  const [fromCurrency, setFromCurrency] = useState<any>(null);
-  const [toCurrency, setToCurrency] = useState<any>(null);
+  const { currencies, leagues, selectedLeague, setSelectedLeague, loading, error } = useCurrencyData();
+  const [fromCurrency, setFromCurrency] = useState<CurrencyItem | null>(null);
+  const [toCurrency, setToCurrency] = useState<CurrencyItem | null>(null);
   const [fromAmount, setFromAmount] = useState<string>('1');
   const [toAmount, setToAmount] = useState<string>('0');
   const [baseCurrency, setBaseCurrency] = useState<'chaos' | 'exalted' | 'divine'>('chaos');
 
+  // Map CurrencyItem to Currency for CurrencySelect component
+  const mappedCurrencies: Currency[] = currencies.map(item => ({
+    id: item.apiId, // Assuming apiId is unique and suitable for id
+    name: item.itemMetadata?.name || item.text,
+    icon: item.itemMetadata?.icon || item.iconUrl,
+  }));
+
   // Set default currencies when data loads
   useEffect(() => {
-    console.log('Setting default currencies, currencies length:', currencies.length);
-    if (currencies.length > 0 && !fromCurrency) {
-      const chaos = currencies.find(c => c.name.toLowerCase().includes('chaos'));
-      const exalted = currencies.find(c => c.name.toLowerCase().includes('exalted'));
-      
+    console.log('Setting default currencies, currencies length:', mappedCurrencies.length);
+    if (mappedCurrencies.length > 0 && !fromCurrency) {
+      const chaos = mappedCurrencies.find(c => c.name.toLowerCase().includes('chaos'));
+      const exalted = mappedCurrencies.find(c => c.name.toLowerCase().includes('exalted'));
+
       console.log('Found chaos:', chaos, 'Found exalted:', exalted);
-      
-      if (chaos) setFromCurrency(chaos);
-      if (exalted) setToCurrency(exalted);
+
+      if (chaos) {
+        const fullChaosCurrency = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('chaos'));
+        setFromCurrency(fullChaosCurrency || null);
+      }
+      if (exalted) {
+        const fullExaltedCurrency = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('exalted'));
+        setToCurrency(fullExaltedCurrency || null);
+      }
     }
-  }, [currencies, fromCurrency]);
+  }, [mappedCurrencies, fromCurrency, currencies]);
 
   // Convert currency when values change
   useEffect(() => {
@@ -97,6 +111,25 @@ function App() {
 
         {/* Main Converter */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* League Selection */}
+          <div className="mb-6">
+            <label htmlFor="league-select" className="block text-sm font-semibold text-gray-700 mb-3">
+              Select League
+            </label>
+            <select
+              id="league-select"
+              value={selectedLeague}
+              onChange={(e) => setSelectedLeague(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {leagues.map((league: League) => (
+                <option key={league.id} value={league.id}>
+                  {league.text}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Base Currency Selection */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -123,9 +156,12 @@ function App() {
             {/* From Currency */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CurrencySelect
-                currencies={currencies}
-                selectedCurrency={fromCurrency}
-                onSelect={setFromCurrency}
+                currencies={mappedCurrencies}
+                selectedCurrency={fromCurrency ? { id: fromCurrency.apiId, name: fromCurrency.itemMetadata?.name || fromCurrency.text, icon: fromCurrency.itemMetadata?.icon || fromCurrency.iconUrl } : null}
+                onSelect={(currency: Currency) => {
+                  const fullCurrencyItem = currencies.find(item => item.apiId === currency.id);
+                  setFromCurrency(fullCurrencyItem || null);
+                }}
                 label="From"
                 placeholder="Select source currency"
               />
@@ -151,9 +187,12 @@ function App() {
             {/* To Currency */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CurrencySelect
-                currencies={currencies}
-                selectedCurrency={toCurrency}
-                onSelect={setToCurrency}
+                currencies={mappedCurrencies}
+                selectedCurrency={toCurrency ? { id: toCurrency.apiId, name: toCurrency.itemMetadata?.name || toCurrency.text, icon: toCurrency.itemMetadata?.icon || toCurrency.iconUrl } : null}
+                onSelect={(currency: Currency) => {
+                  const fullCurrencyItem = currencies.find(item => item.apiId === currency.id);
+                  setToCurrency(fullCurrencyItem || null);
+                }}
                 label="To"
                 placeholder="Select target currency"
               />
@@ -172,7 +211,7 @@ function App() {
                 <div className="text-center">
                   <p className="text-sm text-blue-600 font-medium mb-1">Exchange Rate</p>
                   <p className="text-lg font-bold text-blue-900">
-                    1 {fromCurrency.name} = {convertCurrency(1, fromCurrency, toCurrency, baseCurrency)} {toCurrency.name}
+                    1 {fromCurrency.itemMetadata?.name || fromCurrency.text} = {convertCurrency(1, fromCurrency, toCurrency, baseCurrency)} {toCurrency.itemMetadata?.name || toCurrency.text}
                   </p>
                 </div>
               </div>

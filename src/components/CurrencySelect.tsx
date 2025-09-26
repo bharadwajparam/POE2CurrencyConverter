@@ -1,11 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-
-interface Currency {
-  id: string;
-  name: string;
-  icon: string;
-}
+import { Currency } from '../types/currency';
 
 interface CurrencySelectProps {
   currencies: Currency[];

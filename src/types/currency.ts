@@ -14,6 +14,12 @@ export interface ItemMetadata {
   effect: string[];
 }
 
+export interface Currency {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export interface CurrencyItem {
   id: number;
   itemId: number;
@@ -25,6 +31,9 @@ export interface CurrencyItem {
   itemMetadata: ItemMetadata;
   priceLogs: PriceLog[];
   currentPrice: number;
+  chaosValue: number;
+  exaltedValue: number;
+  divineValue: number;
 }
 
 export interface CurrencyResponse {
@@ -32,4 +41,9 @@ export interface CurrencyResponse {
   pages: number;
   total: number;
   items: CurrencyItem[];
+}
+
+export interface League {
+  id: string;
+  text: string;
 }

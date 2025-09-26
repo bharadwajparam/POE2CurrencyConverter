@@ -1,4 +1,4 @@
-import { CurrencyResponse, CurrencyItem } from '../types/currency';
+import { CurrencyResponse, CurrencyItem, League } from '../types/currency';
 
 const CORS_PROXY = 'https://api.allorigins.win/get?url=';
 const API_BASE = 'https://poe2scout.com/api/items/currency/currency';
@@ -72,9 +72,45 @@ export const fetchCurrencyData = async (league: string = 'Rise of the Abyssal'):
             effect: ["Reforges a rare item with new random modifiers"]
           },
           priceLogs: [],
-          currentPrice: 1
+          currentPrice: 1,
+          chaosValue: 1,
+          exaltedValue: 1 / 170,
+          divineValue: 1 / 680
         }
       ]
     };
+  }
+};
+
+export const fetchLeagues = async (): Promise<League[]> => {
+  try {
+    const url = `https://poe2scout.com/api/leagues`;
+    const proxiedUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+
+    console.log('Fetching leagues from:', proxiedUrl);
+
+    const response = await fetch(proxiedUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const proxyData = await response.json();
+    console.log('Proxy response (leagues):', proxyData);
+
+    const actualData: League[] = JSON.parse(proxyData.contents);
+    console.log('Actual API data (leagues):', actualData);
+
+    // Map the 'value' property from the API response to 'id' and 'text'
+    const transformedLeagues: League[] = actualData.map((league: any) => ({
+      id: league.value,
+      text: league.value,
+    }));
+
+    return transformedLeagues;
+
+  } catch (error) {
+    console.error('Error fetching leagues:', error);
+    return [];
   }
 };
