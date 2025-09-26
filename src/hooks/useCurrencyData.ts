@@ -55,7 +55,6 @@ export const useCurrencyData = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('Loading currencies for selected league:', selectedLeague);
         const data: CurrencyResponse = await fetchCurrencyData(selectedLeague);
 
         console.log('Received data:', data);

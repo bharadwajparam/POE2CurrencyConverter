@@ -9,10 +9,16 @@ import { Currency, League, CurrencyItem } from './types/currency';
 
 function App() {
   const { currencies, leagues, selectedLeague, setSelectedLeague, loading, error } = useCurrencyData();
+  const [pendingSelectedLeague, setPendingSelectedLeague] = useState<string>(selectedLeague);
   const [fromCurrency, setFromCurrency] = useState<CurrencyItem | null>(null);
   const [toCurrency, setToCurrency] = useState<CurrencyItem | null>(null);
   const [fromAmount, setFromAmount] = useState<string>('1');
   const [toAmount, setToAmount] = useState<string>('0');
+
+  // Update pendingSelectedLeague when selectedLeague changes from outside (e.g., initial load)
+  useEffect(() => {
+    setPendingSelectedLeague(selectedLeague);
+  }, [selectedLeague]);
 
   // Map CurrencyItem to Currency for CurrencySelect component
   const mappedCurrencies: Currency[] = currencies.map(item => ({
@@ -111,22 +117,36 @@ function App() {
         {/* Main Converter */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* League Selection */}
-          <div className="mb-6">
-            <label htmlFor="league-select" className="block text-sm font-semibold text-gray-700 mb-3">
-              Select League
-            </label>
-            <select
-              id="league-select"
-              value={selectedLeague}
-              onChange={(e) => setSelectedLeague(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <div className="mb-6 flex items-end">
+            <div className="flex-grow">
+              <label htmlFor="league-select" className="block text-sm font-semibold text-gray-700 mb-3">
+                Select League
+              </label>
+              <select
+                id="league-select"
+                value={pendingSelectedLeague}
+                onChange={(e) => setPendingSelectedLeague(e.target.value)}
+                className="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={loading}
+              >
+                {leagues.map((league: League) => (
+                  <option key={league.id} value={league.id}>
+                    {league.text}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={() => {
+                if (pendingSelectedLeague !== selectedLeague) {
+                  setSelectedLeague(pendingSelectedLeague);
+                }
+              }}
+              disabled={pendingSelectedLeague === selectedLeague || loading}
+              className="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {leagues.map((league: League) => (
-                <option key={league.id} value={league.id}>
-                  {league.text}
-                </option>
-              ))}
-            </select>
+              Confirm
+            </button>
           </div>
 
           {/* Base Currency Selection */}
