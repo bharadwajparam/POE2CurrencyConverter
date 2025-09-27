@@ -1,10 +1,10 @@
 import React from 'react';
-import { Currency } from '../types/currency';
+import { CurrencyItem } from '../types/currency';
 
 interface CurrencySelectorGridProps {
-  currencies: Currency[];
+  currencies: CurrencyItem[];
   selectedCurrencyId: string | null;
-  onSelect: (currency: Currency) => void;
+  onSelect: (currency: CurrencyItem) => void;
 }
 
 export const CurrencySelectorGrid: React.FC<CurrencySelectorGridProps> = ({
@@ -20,11 +20,12 @@ export const CurrencySelectorGrid: React.FC<CurrencySelectorGridProps> = ({
           <button
             key={currency.id}
             className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200
-              ${selectedCurrencyId === currency.id ? 'bg-dark-gray-600 border-2 border-dark-gray-600' : 'hover:bg-dark-gray-600 border-2 border-transparent'}`}
+              ${selectedCurrencyId === currency.apiId ? 'bg-dark-gray-600 border-2 border-dark-gray-600' : 'hover:bg-dark-gray-600 border-2 border-transparent'}`}
             onClick={() => onSelect(currency)}
+            title={currency.itemMetadata?.description || currency.itemMetadata?.name || currency.text}
           >
-            <img src={currency.icon} alt={currency.name} className="w-10 h-10 mb-1" />
-            <span className="text-xs text-center font-medium text-light-gray-200">{currency.name}</span>
+            <img src={currency.itemMetadata?.icon || currency.iconUrl} alt={currency.itemMetadata?.name || currency.text} className="w-10 h-10 mb-1" />
+            <span className="text-xs text-center font-medium text-light-gray-200">{currency.itemMetadata?.name || currency.text}</span>
           </button>
         ))}
       </div>

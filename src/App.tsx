@@ -5,12 +5,12 @@ import { CurrencyInputRow } from './components/CurrencyInputRow';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useCurrencyData } from './hooks/useCurrencyData';
 import { convertCurrency } from './utils/currencyConverter';
-import { Currency, League, CurrencyItem, InputCurrency } from './types/currency';
+import { League, CurrencyItem, InputCurrency } from './types/currency';
 import { CurrencySelectorGrid } from './components/CurrencySelectorGrid'; // Import the new component
 
 function App() {
   const { currencies, leagues, selectedLeague, setSelectedLeague, loading, error } = useCurrencyData();
-  const [pendingSelectedLeague, setPendingSelectedLeague] = useState<string>(selectedLeague);
+  const [pendingSelectedLeague, setPendingSelectedLeague] = useState<string>(selectedLeague || '');
   const [inputCurrencies, setInputCurrencies] = useState<InputCurrency[]>([]);
   const [toCurrency, setToCurrency] = useState<CurrencyItem | null>(null);
   const [toAmount, setToAmount] = useState<string>('0');
@@ -22,20 +22,13 @@ function App() {
 
   // Update pendingSelectedLeague when selectedLeague changes from outside (e.g., initial load)
   useEffect(() => {
-    setPendingSelectedLeague(selectedLeague);
+    setPendingSelectedLeague(selectedLeague || '');
   }, [selectedLeague]);
-
-  // Map CurrencyItem to Currency for CurrencySelect component
-  const mappedCurrencies: Currency[] = currencies.map(item => ({
-    id: item.apiId, // Assuming apiId is unique and suitable for id
-    name: item.itemMetadata?.name || item.text,
-    icon: item.itemMetadata?.icon || item.iconUrl,
-  }));
 
   // Set default currencies when data loads
   useEffect(() => {
-    console.log('Setting default currencies, currencies length:', mappedCurrencies.length);
-    if (mappedCurrencies.length > 0 && inputCurrencies.length === 0) {
+    console.log('Setting default currencies, currencies length:', currencies.length);
+    if (currencies.length > 0 && inputCurrencies.length === 0) {
       const chaos = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase().includes('chaos'));
       const exalted = currencies.find(c => (c.itemMetadata?.name || c.text).toLowerCase() === 'exalted orb');
 
@@ -47,7 +40,7 @@ function App() {
         setToCurrency(exalted);
       }
     }
-  }, [mappedCurrencies, currencies, inputCurrencies.length]);
+  }, [currencies, inputCurrencies.length]);
 
   // Convert currency when values change
   useEffect(() => {
@@ -83,12 +76,11 @@ function App() {
     setIsInputRowSelectorOpen(true);
   };
 
-  const handleCurrencySelectForInputRow = (currency: Currency) => {
+  const handleCurrencySelectForInputRow = (currency: CurrencyItem) => {
     if (currentInputRowId) {
-      const fullCurrencyItem = currencies.find(item => item.apiId === currency.id);
       setInputCurrencies(prevInputs =>
         prevInputs.map(item =>
-          item.id === currentInputRowId ? { ...item, currency: fullCurrencyItem || null } : item
+          item.id === currentInputRowId ? { ...item, currency: currency || null } : item
         )
       );
       setIsInputRowSelectorOpen(false);
@@ -153,11 +145,10 @@ function App() {
           {/* Currency Selector Grid (Left Panel) - for "To" currency */}
           <div className="lg:w-1/3">
             <CurrencySelectorGrid
-              currencies={mappedCurrencies}
+              currencies={currencies}
               selectedCurrencyId={toCurrency?.apiId || null}
-              onSelect={(currency: Currency) => {
-                const fullCurrencyItem = currencies.find(item => item.apiId === currency.id);
-                setToCurrency(fullCurrencyItem || null);
+              onSelect={(currency: CurrencyItem) => {
+                setToCurrency(currency || null);
               }}
             />
           </div>
@@ -268,7 +259,7 @@ function App() {
                 &times;
               </button>
               <CurrencySelectorGrid
-                currencies={mappedCurrencies}
+                currencies={currencies}
                 selectedCurrencyId={inputCurrencies.find(input => input.id === currentInputRowId)?.currency?.apiId || null}
                 onSelect={handleCurrencySelectForInputRow}
               />

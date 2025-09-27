@@ -7,7 +7,7 @@ interface CurrencyInputRowProps {
   id: string;
   selectedCurrency: CurrencyItem | null;
   amount: string;
-  onCurrencySelect: (currency: Currency) => void;
+  onCurrencySelect: (currency: CurrencyItem) => void;
   onAmountChange: (amount: string) => void;
   onRemove: (id: string) => void;
   onOpenCurrencySelector: (inputId: string) => void; // New prop to open the selector
