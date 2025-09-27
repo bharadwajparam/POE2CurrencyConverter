@@ -20,8 +20,10 @@ export const useCurrencyData = () => {
         console.log("List of leagues", fetchLeagues);
         if (fetchedLeagues.length > 0) {
           setLeagues(fetchedLeagues);
-          // Set the first league as default or find a specific one
-          const defaultLeague = fetchedLeagues.find(l => l.id === 'Standard') || fetchedLeagues[0];
+          // Set "Rise of the Abyssal" as default, or fall back to "Standard", then the first league
+          const defaultLeague = fetchedLeagues.find(l => l.text === 'Rise of the Abyssal') ||
+                                fetchedLeagues.find(l => l.id === 'Standard') ||
+                                fetchedLeagues[0];
           setSelectedLeague(defaultLeague.id);
           console.log('Leagues loaded:', fetchedLeagues);
           console.log('Selected default league:', defaultLeague.id);
