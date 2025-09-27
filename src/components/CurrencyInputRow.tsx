@@ -29,24 +29,24 @@ export const CurrencyInputRow: React.FC<CurrencyInputRowProps> = ({
   return (
     <div className="flex items-end space-x-2 mb-4">
       <div className="flex-grow">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className="block text-sm font-semibold text-light-gray-200 mb-2">
           {label}
         </label>
         <button
           type="button"
-          className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-left shadow-sm hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+          className="w-full bg-dark-gray-800 border-2 border-dark-gray-600 rounded-xl px-4 py-3 text-left shadow-sm hover:border-dark-gray-600 focus:border-dark-gray-600 focus:ring-2 focus:ring-dark-gray-600 transition-all duration-200"
           onClick={() => onOpenCurrencySelector(id)}
         >
           <div className="flex items-center justify-between">
             {selectedCurrency ? (
               <div className="flex items-center space-x-3">
                 <img src={selectedCurrency.itemMetadata?.icon || selectedCurrency.iconUrl} alt={selectedCurrency.itemMetadata?.name || selectedCurrency.text} className="w-6 h-6" />
-                <span className="font-medium text-gray-900">{selectedCurrency.itemMetadata?.name || selectedCurrency.text}</span>
+                <span className="font-medium text-light-gray-200">{selectedCurrency.itemMetadata?.name || selectedCurrency.text}</span>
               </div>
             ) : (
-              <span className="text-gray-500">Select currency</span>
+              <span className="text-light-gray-200">Select currency</span>
             )}
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-light-gray-200" />
           </div>
         </button>
       </div>
@@ -61,7 +61,7 @@ export const CurrencyInputRow: React.FC<CurrencyInputRowProps> = ({
       {isRemovable && (
         <button
           onClick={() => onRemove(id)}
-          className="p-2 text-red-500 hover:text-red-700 transition-colors"
+          className="p-2 text-red-500 hover:text-red-600 transition-colors"
           aria-label="Remove currency"
         >
           <XCircle className="w-6 h-6" />

@@ -34,7 +34,7 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label className="block text-sm font-semibold text-light-gray-200 mb-2">
         {label}
       </label>
       <input
@@ -43,10 +43,10 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
         onChange={handleChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-lg font-medium shadow-sm transition-all duration-200 ${
-          readOnly 
-            ? 'bg-gray-50 text-gray-600 cursor-not-allowed' 
-            : 'bg-white hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none'
+        className={`w-full px-4 py-3 border-2 border-dark-gray-600 rounded-xl text-lg font-medium shadow-sm transition-all duration-200 ${
+          readOnly
+            ? 'bg-dark-gray-800 text-light-gray-200 cursor-not-allowed'
+            : 'bg-dark-gray-800 hover:border-dark-gray-600 focus:border-dark-gray-600 focus:ring-2 focus:ring-dark-gray-600 focus:outline-none text-light-gray-200'
         }`}
       />
     </div>

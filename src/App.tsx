@@ -102,10 +102,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="min-h-screen bg-dark-gray-900 flex items-center justify-center">
+        <div className="bg-dark-gray-800 rounded-2xl shadow-xl p-8">
           <LoadingSpinner />
-          <p className="text-center text-gray-600 mt-4">Loading currency data...</p>
+          <p className="text-center text-light-gray-200 mt-4">Loading currency data...</p>
         </div>
       </div>
     );
@@ -113,16 +113,16 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+      <div className="min-h-screen bg-dark-gray-900 flex items-center justify-center p-4">
+        <div className="bg-dark-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full">
           <div className="flex items-center justify-center mb-4">
             <AlertCircle className="w-12 h-12 text-red-500" />
           </div>
-          <h2 className="text-xl font-bold text-center text-gray-900 mb-2">Error Loading Data</h2>
-          <p className="text-center text-gray-600 mb-6">{error}</p>
+          <h2 className="text-xl font-bold text-center text-light-gray-200 mb-2">Error Loading Data</h2>
+          <p className="text-center text-light-gray-200 mb-6">{error}</p>
           <button
             onClick={handleRefresh}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
+            className="w-full bg-dark-gray-600 hover:bg-dark-gray-700 text-light-gray-200 font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Retry</span>
@@ -133,18 +133,18 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen bg-dark-gray-900 p-4">
       <div className="max-w-6xl mx-auto py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Coins className="w-12 h-12 text-blue-600 mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PoE Currency Converter
+            <Coins className="w-12 h-12 text-light-gray-200 mr-3" />
+            <h1 className="text-4xl font-bold text-light-gray-200">
+              Path of Exile 2 - Currency Converter
             </h1>
           </div>
-          <p className="text-gray-600 text-lg">
-            Convert Path of Exile currencies with real-time exchange rates
+          <p className="text-light-gray-200 text-lg">
+            Convert Path of Exile 2 currencies with real-time exchange rates
           </p>
         </div>
 
@@ -163,18 +163,18 @@ function App() {
           </div>
 
           {/* Main Converter (Right Panel) */}
-          <div className="lg:w-2/3 bg-white rounded-2xl shadow-xl p-8">
+          <div className="lg:w-2/3 bg-dark-gray-800 rounded-2xl shadow-xl p-8">
             {/* League Selection */}
             <div className="mb-6 flex items-end">
               <div className="flex-grow">
-                <label htmlFor="league-select" className="block text-sm font-semibold text-gray-700 mb-3">
+                <label htmlFor="league-select" className="block text-sm font-semibold text-light-gray-200 mb-3">
                   Select League
                 </label>
                 <select
                   id="league-select"
                   value={pendingSelectedLeague}
                   onChange={(e) => setPendingSelectedLeague(e.target.value)}
-                  className="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full p-3 border border-dark-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-dark-gray-600 focus:border-dark-gray-600 bg-dark-gray-800 text-light-gray-200"
                   disabled={loading}
                 >
                   {leagues.map((league: League) => (
@@ -191,7 +191,7 @@ function App() {
                   }
                 }}
                 disabled={pendingSelectedLeague === selectedLeague || loading}
-                className="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ml-4 bg-dark-gray-600 hover:bg-dark-gray-700 text-light-gray-200 font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Confirm
               </button>
@@ -225,7 +225,7 @@ function App() {
               {/* Add Currency Button */}
               <button
                 onClick={handleAddCurrencyInput}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2 mt-4"
+                className="w-full bg-green-500 hover:bg-green-600 text-light-gray-200 font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2 mt-4"
               >
                 <PlusCircle className="w-5 h-5" />
                 <span>Add Another Currency</span>
@@ -244,10 +244,10 @@ function App() {
 
               {/* Exchange Rate Display */}
               {toCurrency && inputCurrencies.some(input => input.currency && parseFloat(input.amount) > 0) && (
-                <div className="bg-blue-50 rounded-xl p-4 mt-6">
+                <div className="bg-dark-gray-600 rounded-xl p-4 mt-6">
                   <div className="text-center">
-                    <p className="text-sm text-blue-600 font-medium mb-1">Total Converted Amount</p>
-                    <p className="text-lg font-bold text-blue-900">
+                    <p className="text-sm text-light-gray-200 font-medium mb-1">Total Converted Amount</p>
+                    <p className="text-lg font-bold text-light-gray-200">
                       {toAmount} {toCurrency.itemMetadata?.name || toCurrency.text}
                     </p>
                   </div>
@@ -259,11 +259,11 @@ function App() {
 
         {/* Currency Selector Modal for Input Rows */}
         {isInputRowSelectorOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+          <div className="fixed inset-0 bg-dark-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className="bg-dark-gray-800 rounded-2xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
               <button
                 onClick={() => setIsInputRowSelectorOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                className="absolute top-4 right-4 text-light-gray-200 hover:text-dark-gray-600 text-2xl font-bold"
               >
                 &times;
               </button>
@@ -277,7 +277,7 @@ function App() {
         )}
 
         {/* Footer */}
-        <div className="text-center mt-8 text-gray-500 text-sm">
+        <div className="text-center mt-8 text-light-gray-200 text-sm">
           <p>Data provided by poe2scout.com</p>
         </div>
       </div>
