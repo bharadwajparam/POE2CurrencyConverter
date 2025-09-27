@@ -278,7 +278,7 @@ function App() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-500 text-sm">
-          <p>Data provided by poe2scout.com • Rates update automatically</p>
+          <p>Data provided by poe2scout.com</p>
         </div>
       </div>
     </div>
